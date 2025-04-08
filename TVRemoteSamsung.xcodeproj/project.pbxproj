@@ -17,6 +17,7 @@
 		346CCD7C2DA5437D002661DE /* StorageManager in Frameworks */ = {isa = PBXBuildFile; productRef = 346CCD7B2DA5437D002661DE /* StorageManager */; };
 		346CCD812DA548F3002661DE /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 346CCD802DA548F3002661DE /* Utilities */; };
 		346CCD842DA548FE002661DE /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 346CCD832DA548FE002661DE /* SnapKit */; };
+		34D9B0E22DA577CC00DE2FC2 /* ShadowImageButton in Frameworks */ = {isa = PBXBuildFile; productRef = 34D9B0E12DA577CC00DE2FC2 /* ShadowImageButton */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +53,7 @@
 				346CCD732DA54338002661DE /* Lottie in Frameworks */,
 				346CCD6A2DA542D1002661DE /* CustomNavigationView in Frameworks */,
 				346CCD762DA5435A002661DE /* PremiumManager in Frameworks */,
+				34D9B0E22DA577CC00DE2FC2 /* ShadowImageButton in Frameworks */,
 				346CCD792DA54372002661DE /* SDWebImage in Frameworks */,
 				346CCD812DA548F3002661DE /* Utilities in Frameworks */,
 				346CCD702DA54311002661DE /* FirebaseCrashlytics in Frameworks */,
@@ -111,6 +113,7 @@
 				346CCD7B2DA5437D002661DE /* StorageManager */,
 				346CCD802DA548F3002661DE /* Utilities */,
 				346CCD832DA548FE002661DE /* SnapKit */,
+				34D9B0E12DA577CC00DE2FC2 /* ShadowImageButton */,
 			);
 			productName = TVRemoteSamsung;
 			productReference = 346CCCBF2DA53DBB002661DE /* TVRemoteSamsung.app */;
@@ -151,6 +154,7 @@
 				346CCD7A2DA5437D002661DE /* XCRemoteSwiftPackageReference "StorageManager" */,
 				346CCD7F2DA548F3002661DE /* XCRemoteSwiftPackageReference "Utilities" */,
 				346CCD822DA548FE002661DE /* XCRemoteSwiftPackageReference "SnapKit" */,
+				34D9B0E02DA577CC00DE2FC2 /* XCRemoteSwiftPackageReference "ShadowImageButton" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 346CCCC02DA53DBB002661DE /* Products */;
@@ -458,6 +462,14 @@
 				minimumVersion = 5.7.1;
 			};
 		};
+		34D9B0E02DA577CC00DE2FC2 /* XCRemoteSwiftPackageReference "ShadowImageButton" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/reganomika/ShadowImageButton";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -510,6 +522,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 346CCD822DA548FE002661DE /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		34D9B0E12DA577CC00DE2FC2 /* ShadowImageButton */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 34D9B0E02DA577CC00DE2FC2 /* XCRemoteSwiftPackageReference "ShadowImageButton" */;
+			productName = ShadowImageButton;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

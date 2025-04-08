@@ -28,7 +28,7 @@ class CommonController: UIViewController {
     }
     
     func setupView() {
-        view.backgroundColor = .init(hex: "#0B1225")
+        view.backgroundColor = .init(hex: "#161430")
         navigationController?.setNavigationBarHidden(true, animated: false)
         view.addSubview(topView)
     }

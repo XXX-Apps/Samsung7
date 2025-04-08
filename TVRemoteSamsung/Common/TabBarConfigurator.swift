@@ -7,27 +7,27 @@ final class TabBarConfigurator {
         let configuration = TabBarConfiguration(
             cornerRadius: 0,
             stackViewSpacing: 0,
-            tabBarHeight: UIScreen.isLittleDevice ? 83 : 103,
+            tabBarHeight: UIScreen.isLittleDevice ? 83 : 105,
             tabBarItems: [
                 .init(
                     title: "Controller".localized,
-                    image: UIImage(named: "remoteTab")
+                    image: UIImage(named: "controllerTab")
                 ),
                 .init(
                     title: "Applications".localized,
-                    image: UIImage(named: "remoteTab")
+                    image: UIImage(named: "applicationsTab")
                 ),
                 .init(
                     title: "Options".localized,
-                    image: UIImage(named: "remoteTab")
+                    image: UIImage(named: "optionsTab")
                 )
             ],
-            unselectedItemColor:.init(hex: "54648E"),
-            font: .font(weight: .medium, size: 14),
+            unselectedItemColor:.init(hex: "7575AF"),
+            font: .font(weight: .regular, size: 14),
             stackViewTopInset: 12,
             stackViewHeight: 57,
             itemWidth: UIScreen.main.bounds.width / 3,
-            backgroundColor: .init(hex: "21293E")
+            backgroundColor: .init(hex: "1B1B47")
         )
 
         let tabBarController = TabBarController(
