@@ -1,54 +1,88 @@
+import Combine
+import PremiumManager
 import UIKit
+import Foundation
 import Utilities
+import RxSwift
 
-enum OptionType {
-    case share
-    case terms
-    case privacy
-    case changeIcon
+protocol MenuOptionRepresentable {
+    var iconAsset: UIImage? { get }
+    var displayTitle: String { get }
+}
+
+enum AppMenuOption: MenuOptionRepresentable {
+    case shareApp
+    case privacyPolicy
+    case termsOfService
+    case alternateIcons
     
-    var image: UIImage? {
+    var iconAsset: UIImage? {
         switch self {
-        case .share: return UIImage(named: "share")
-        case .privacy: return UIImage(named: "privacy")
-        case .terms: return UIImage(named: "terms")
-        case .changeIcon: return UIImage(named: "switchIcon")
+        case .shareApp: return UIImage(named: "share")
+        case .privacyPolicy: return UIImage(named: "privacy")
+        case .termsOfService: return UIImage(named: "terms")
+        case .alternateIcons: return UIImage(named: "switchIcon")
         }
     }
     
-    var title: String {
+    var displayTitle: String {
         switch self {
-        case .share: return "Share the app".localized
-        case .privacy: return "Privacy Policy".localized
-        case .terms: return "Terms of Use".localized
-        case .changeIcon: return "Switch app icon".localized
+        case .shareApp: return "Share the app".localized
+        case .privacyPolicy: return "Privacy Policy".localized
+        case .termsOfService: return "Terms of Use".localized
+        case .alternateIcons: return "Switch app icon".localized
         }
     }
 }
 
-enum OptionCellType {
-    case premium
-    case settings(type: OptionType)
+enum MenuRowConfiguration {
+    case premiumPromotion
+    case standardOption(AppMenuOption)
 }
 
-final class OptionsViewModel {
+// MARK: - View Model
+
+protocol MenuContentUpdatable: AnyObject {
+    func menuContentDidChange()
+}
+
+class MenuContentProvider {
+    weak var delegate: MenuContentUpdatable?
     
-    var onUpdate: (() -> Void)?
+    private let disposeBag = DisposeBag()
     
-    var cells: [OptionCellType] = []
+    private(set) var currentRows: [MenuRowConfiguration] = []
     
-    func configureCells(isPremium: Bool = false) {
-        
-        cells.removeAll()
+    init() {
+        setupPremiumSubscription()
+    }
+    
+    func rebuildMenu(forPremiumStatus isPremium: Bool = false) {
+        currentRows.removeAll()
         
         if !isPremium {
-            cells.append(.premium)
+            currentRows.append(.premiumPromotion)
         }
-        cells.append(.settings(type: .changeIcon))
-        cells.append(.settings(type: .share))
-        cells.append(.settings(type: .privacy))
-        cells.append(.settings(type: .terms))
         
-        onUpdate?()
+        let standardOptions: [AppMenuOption] = [
+            .alternateIcons,
+            .shareApp,
+            .privacyPolicy,
+            .termsOfService
+        ]
+        
+        currentRows += standardOptions.map { .standardOption($0) }
+        delegate?.menuContentDidChange()
+    }
+    
+    private func setupPremiumSubscription() {
+        
+        PremiumManager.shared.isPremium
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { isPremium in
+                self.rebuildMenu(forPremiumStatus: isPremium)
+            })
+            .disposed(by: disposeBag)
     }
 }
+

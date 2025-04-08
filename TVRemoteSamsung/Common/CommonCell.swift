@@ -4,7 +4,7 @@ import SnapKit
 
 final class CommonCell: UITableViewCell {
     
-    static let identifier = "CommonCell"
+    static let reuseID = "CommonCell"
     
     private lazy var customBackgroundView: UIView = {
         let view = UIView()
@@ -64,9 +64,9 @@ final class CommonCell: UITableViewCell {
         }
     }
     
-    func configure(type: OptionType) {
-        titleLabel.text = type.title
-        leftImageView.image = type.image
+    func configure(type: AppMenuOption) {
+        titleLabel.text = type.displayTitle
+        leftImageView.image = type.iconAsset
     }
     
 //    func configure(app: TVApp) {

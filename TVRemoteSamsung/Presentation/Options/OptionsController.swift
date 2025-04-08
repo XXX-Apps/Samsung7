@@ -7,156 +7,138 @@ import Combine
 import Utilities
 import SafariServices
 
-final class OptionsController: CommonController {
-    
-    private let viewModel = OptionsViewModel()
-    
-    private var cancellables = Set<AnyCancellable>()
-    
-    private let disposeBag = DisposeBag()
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Options".localized
-        label.font = .font(weight: .medium, size: 16)
-        return label
-    }()
-    
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.showsVerticalScrollIndicator = false
-        tableView.backgroundColor = .clear
-        tableView.register(OptionsPremiumCell.self, forCellReuseIdentifier: OptionsPremiumCell.identifier)
-        tableView.register(CommonCell.self, forCellReuseIdentifier: CommonCell.identifier)
-        tableView.separatorStyle = .none
-        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
-        return tableView
-    }()
+class OptionsController: CommonController {
+    private let contentProvider = MenuContentProvider()
+    private let menuTableView = UITableView()
+    private let navigationTitle = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureViewHierarchy()
+        configureContentProvider()
+        configureNavigation()
+        markOnboardingAsComplete()
+    }
+    
+    private func configureViewHierarchy() {
+        view.addSubview(menuTableView)
+        menuTableView.snp.makeConstraints {
+            $0.top.equalTo(topView.snp.bottom)
+            $0.left.right.bottom.equalToSuperview()
+        }
         
-        LocalDataBase.shared.isOnboardingShown = true
-        
-        configurNavigation(
-            centerView: titleLabel
+        menuTableView.register(
+            PremiumPromotionCell.self,
+            forCellReuseIdentifier: PremiumPromotionCell.reuseID
+        )
+        menuTableView.register(
+            CommonCell.self,
+            forCellReuseIdentifier: CommonCell.reuseID
         )
         
-        setupUI()
-        setupSubscriptions()
-        
-        viewModel.configureCells(isPremium: false)
+        menuTableView.delegate = self
+        menuTableView.dataSource = self
+        menuTableView.backgroundColor = .clear
+        menuTableView.separatorStyle = .none
+        menuTableView.contentInset.bottom = 100
     }
     
-    func setupUI() {
-        
-        view.addSubview(tableView)
-    
-        tableView.snp.makeConstraints { make in
-            make.top.equalTo(topView.snp.bottom)
-            make.left.right.bottom.equalToSuperview()
-        }
+    private func configureContentProvider() {
+        contentProvider.delegate = self
+        contentProvider.rebuildMenu(forPremiumStatus: false)
     }
     
-    private func setupSubscriptions() {
-        PremiumManager.shared.isPremium
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { isPremium in
-                self.viewModel.configureCells(isPremium: isPremium)
-            })
-            .disposed(by: disposeBag)
-        
-        viewModel.onUpdate = { [weak self] in
-            self?.tableView.reloadData()
-        }
+    private func configureNavigation() {
+        navigationTitle.text = "Options".localized
+        navigationTitle.font = .font(weight: .medium, size: 16)
+        configurNavigation(centerView: navigationTitle)
     }
     
-    private func openPaywall() {
+    private func markOnboardingAsComplete() {
+        LocalDataBase.shared.isOnboardingShown = true
+    }
+}
 
-    }
-    
-    private func openShare() {
-        let appURL = URL(string: "https://apps.apple.com/us/app/\(Config.appId)")!
-        let activityViewController = UIActivityViewController(activityItems: [appURL], applicationActivities: nil)
-        activityViewController.popoverPresentationController?.sourceView = self.view
-        present(activityViewController, animated: true)
-    }
-    
-    private func openPrivacy() {
-        if let url = URL(string: Config.privacy) {
-            let safariVC = SFSafariViewController(url: url)
-            present(safariVC, animated: true, completion: nil)
-        }
-    }
-    
-    private func openTerms() {
-        if let url = URL(string: Config.terms) {
-            let safariVC = SFSafariViewController(url: url)
-            present(safariVC, animated: true, completion: nil)
-        }
-    }
-    
-    private func openChangeIcon() {
-
+extension OptionsController: MenuContentUpdatable {
+    func menuContentDidChange() {
+        menuTableView.reloadData()
     }
 }
 
 extension OptionsController: UITableViewDataSource, UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.cells.count
+        return contentProvider.currentRows.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cellType = viewModel.cells[indexPath.row]
-        
-        switch cellType {
-        case .premium:
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: OptionsPremiumCell.identifier) as? OptionsPremiumCell else {
-                fatalError("Could not dequeue SettingsPremiumCell")
-            }
+        switch contentProvider.currentRows[indexPath.row] {
+        case .premiumPromotion:
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: PremiumPromotionCell.reuseID,
+                for: indexPath
+            ) as! PremiumPromotionCell
             return cell
-        case .settings(let type):
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: CommonCell.identifier) as? CommonCell else {
-                fatalError("Could not dequeue SettingsPremiumCell")
-            }
-            cell.configure(type: type)
+            
+        case .standardOption(let option):
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: CommonCell.reuseID,
+                for: indexPath
+            ) as! CommonCell
+            cell.configure(type: option)
             return cell
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        let cellType = viewModel.cells[indexPath.row]
         
-        switch cellType {
-        case .premium:
-            openPaywall()
-        case .settings(let type):
-            switch type {
-            case .share:
-                openShare()
-            case .privacy:
-                openPrivacy()
-            case .terms:
-                openTerms()
-            case .changeIcon:
-                openChangeIcon()
-            }
+        switch contentProvider.currentRows[indexPath.row] {
+        case .premiumPromotion:
+            presentPremiumPaywall()
+            
+        case .standardOption(let option):
+            handleMenuOptionSelection(option)
         }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let cellType = viewModel.cells[indexPath.row]
-        
-        switch cellType {
-        case .premium:
-            return UITableView.automaticDimension
-        case .settings:
-            return 86
+        switch contentProvider.currentRows[indexPath.row] {
+        case .premiumPromotion: return UITableView.automaticDimension
+        case .standardOption: return 86
         }
     }
+    
+    private func handleMenuOptionSelection(_ option: AppMenuOption) {
+        switch option {
+        case .shareApp:
+            presentShareSheet()
+        case .privacyPolicy:
+            presentWebView(urlString: Config.privacy)
+        case .termsOfService:
+            presentWebView(urlString: Config.terms)
+        case .alternateIcons:
+            presentIconSelection()
+        }
+    }
+    
+    private func presentShareSheet() {
+        let appStoreURL = URL(string: "https://apps.apple.com/us/app/\(Config.appId)")!
+        let activityVC = UIActivityViewController(activityItems: [appStoreURL], applicationActivities: nil)
+        activityVC.popoverPresentationController?.sourceView = view
+        present(activityVC, animated: true)
+    }
+    
+    private func presentWebView(urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true)
+    }
+    
+    private func presentPremiumPaywall() {
+        // Paywall presentation logic
+    }
+    
+    private func presentIconSelection() {
+        // Icon selection logic
+    }
 }
-
