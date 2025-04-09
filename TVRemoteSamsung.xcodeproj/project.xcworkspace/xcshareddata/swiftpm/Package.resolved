@@ -1,5 +1,5 @@
 {
-  "originHash" : "80a9cd0aafd4dadfe663dec38bf0c001050e69df141070f18d4f4095f84c964e",
+  "originHash" : "706f34b181808873e07b393baff407b0f98aa00324ecf53a79bab06bb8d44759",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -193,10 +193,19 @@
     {
       "identity" : "snapkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SnapKit/SnapKit.git",
+      "location" : "https://github.com/SnapKit/SnapKit",
       "state" : {
         "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
         "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "starscream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daltoniam/Starscream.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "c6bfd1af48efcc9a9ad203665db12375ba6b145a"
       }
     },
     {
@@ -215,6 +224,24 @@
       "state" : {
         "revision" : "d72aed98f8253ec1aa9ea1141e28150f408cf17f",
         "version" : "1.29.0"
+      }
+    },
+    {
+      "identity" : "tvcommanderkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wdesimini/TVCommanderKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c92038583e58a4d3d1cba229b13dd39906519686"
+      }
+    },
+    {
+      "identity" : "tvremotecontrol",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/reganomika/TVRemoteControl",
+      "state" : {
+        "branch" : "lg",
+        "revision" : "34b158b74f1c5b630802bb4b0b572bfa9b61fa78"
       }
     },
     {

@@ -1,6 +1,7 @@
 import Utilities
 import UIKit
 import SnapKit
+import TVRemoteControl
 
 final class CommonCell: UITableViewCell {
     
@@ -69,16 +70,16 @@ final class CommonCell: UITableViewCell {
         leftImageView.image = type.iconAsset
     }
     
-//    func configure(app: TVApp) {
-//        titleLabel.text = app.name
-//        leftImageView.image = app.image
-//        
-//        leftImageView.snp.updateConstraints { make in
-//            make.height.width.equalTo(50)
-//        }
-//        
-//        titleLabel.snp.updateConstraints { make in
-//            make.left.equalToSuperview().inset(96)
-//        }
-//    }
+    func configure(app: TVApp) {
+        titleLabel.text = app.name
+        leftImageView.image = app.image
+        
+        leftImageView.snp.updateConstraints { make in
+            make.height.width.equalTo(50)
+        }
+        
+        titleLabel.snp.updateConstraints { make in
+            make.left.equalToSuperview().inset(96)
+        }
+    }
 }
