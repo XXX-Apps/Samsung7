@@ -1,46 +1,59 @@
 import UIKit
 import TVRemoteControl
 
-final class ApplicationsViewModel {
+// MARK: - View Model
+
+final class TVApplicationsViewModel {
     
-    let tvAppManager = TVAppManager()
+    // MARK: - Dependencies
     
-    var apps: [TVApp] = TVApp.allApps()
+    private let appLauncher = TVAppManager()
+    private let connectionService = SamsungTVConnectionService.shared
     
-    func openApp(app: TVApp) {
+    // MARK: - Properties
+    
+    private(set) var availableApps: [TVApp] = TVApp.allApps()
+    
+    
+    // MARK: - Public Methods
+    
+    func launchApplication(_ app: TVApp) throws {
+        guard let device = connectionService.connectedDevice else {
+            throw ApplicationError.deviceNotConnected
+        }
+        
         if let ipAddress = SamsungTVConnectionService.shared.connectedDevice?.ipAddress {
             Task {
-                try await tvAppManager.launch(tvApp: app, tvIPAddress: ipAddress)
+                try await appLauncher.launch(tvApp: app, tvIPAddress: ipAddress)
             }
         }
     }
 }
 
-extension TVApp {
-    
-    var image: UIImage? {
-        switch name {
-        case "ESPN":
-            return UIImage(named: "espn")
-        case "Hulu":
-            return UIImage(named: "hulu")
-        case "Max":
-            return UIImage(named: "max")
-        case "Netflix":
-            return UIImage(named: "netflix")
-        case "Paramount +":
-            return UIImage(named: "paramount")
-        case "Pluto TV":
-            return UIImage(named: "pluto")
-        case "Prime Video":
-            return UIImage(named: "prime")
-        case "Spotify":
-            return UIImage(named: "spotify")
-        case "YouTube":
-            return UIImage(named: "youtube")
-        default:
-            return nil
-        }
+// MARK: - Error Handling
+
+extension TVApplicationsViewModel {
+    enum ApplicationError: Error {
+        case deviceNotConnected
     }
 }
 
+// MARK: - TVApp Extension
+
+extension TVApp {
+    var iconImage: UIImage? {
+        let appIcons: [String: String] = [
+            "ESPN": "espn",
+            "Hulu": "hulu",
+            "Max": "max",
+            "Netflix": "netflix",
+            "Paramount +": "paramount",
+            "Pluto TV": "pluto",
+            "Prime Video": "prime",
+            "Spotify": "spotify",
+            "YouTube": "youtube"
+        ]
+        
+        return appIcons[name].flatMap { UIImage(named: $0) }
+    }
+}

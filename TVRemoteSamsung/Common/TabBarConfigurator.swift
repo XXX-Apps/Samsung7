@@ -33,7 +33,7 @@ final class TabBarConfigurator {
         let tabBarController = TabBarController(
             viewControllers: [
                 UINavigationController(rootViewController: TVController()),
-                UINavigationController(rootViewController: ApplicationsController()),
+                UINavigationController(rootViewController: TVApplicationsViewController()),
                 UINavigationController(rootViewController: OptionsController())
             ],
             configuration: configuration

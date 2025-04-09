@@ -72,7 +72,7 @@ final class CommonCell: UITableViewCell {
     
     func configure(app: TVApp) {
         titleLabel.text = app.name
-        leftImageView.image = app.image
+        leftImageView.image = app.iconImage
         
         leftImageView.snp.updateConstraints { make in
             make.height.width.equalTo(50)
