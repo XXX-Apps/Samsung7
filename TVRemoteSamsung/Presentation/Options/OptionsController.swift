@@ -139,6 +139,6 @@ extension OptionsController: UITableViewDataSource, UITableViewDelegate {
     }
     
     private func presentIconSelection() {
-        // Icon selection logic
+        presentCrossDissolve(vc: IconSelectionViewController())
     }
 }
