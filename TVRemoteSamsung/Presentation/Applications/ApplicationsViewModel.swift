@@ -17,10 +17,7 @@ final class TVApplicationsViewModel {
     
     // MARK: - Public Methods
     
-    func launchApplication(_ app: TVApp) throws {
-        guard let device = connectionService.connectedDevice else {
-            throw ApplicationError.deviceNotConnected
-        }
+    func launchApplication(_ app: TVApp) {
         
         if let ipAddress = SamsungTVConnectionService.shared.connectedDevice?.ipAddress {
             Task {
