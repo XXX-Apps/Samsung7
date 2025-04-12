@@ -1,20 +1,23 @@
 import SnapKit
 import UIKit
-import RxSwift
-import PremiumManager
-import CustomBlurEffectView
-import Combine
-import Utilities
 import TVRemoteControl
 import ShadowImageButton
+import CustomBlurEffectView
 
-private enum Constants {
+// MARK: - Constants
+
+private enum LayoutConstants {
     static let buttonCornerRadius: CGFloat = 31
     static let shadowRadius: CGFloat = 14.7
     static let shadowOffset = CGSize(width: 0, height: 4)
     static let shadowOpacity: Float = 0.6
     static let headerCellHeight: CGFloat = 400
+    static let deviceCellHeight: CGFloat = 106
+    static let infoViewHeight: CGFloat = 128
+    static let successInfoViewHeight: CGFloat = 283
 }
+
+// MARK: - View Controller
 
 final class DevicesController: CommonController {
     
@@ -33,11 +36,9 @@ final class DevicesController: CommonController {
         }
     }
     
-    private lazy var shadowImageView: UIImageView = {
-        let view = UIImageView(image: UIImage(named: "devicesShadow"))
-        view.contentMode = .scaleAspectFill
-        return view
-    }()
+    private lazy var shadowImageView = UIImageView(image: UIImage(named: "devicesShadow")).then {
+        $0.contentMode = .scaleAspectFill
+    }
     
     private lazy var navigationTitleLabel = UILabel().then {
         $0.text = "Connections".localized
@@ -50,12 +51,11 @@ final class DevicesController: CommonController {
     }
     
     private lazy var guideButton = UIButton().then {
-        let title = "Can’t connect".localized
-        let attributedTitle = NSAttributedString(
-            string: title,
-            attributes: [.underlineStyle: NSUnderlineStyle.single.rawValue]
-        )
-        $0.setAttributedTitle(attributedTitle, for: .normal)
+        let title = "Can't connect".localized
+        let attributes: [NSAttributedString.Key: Any] = [
+            .underlineStyle: NSUnderlineStyle.single.rawValue
+        ]
+        $0.setAttributedTitle(NSAttributedString(string: title, attributes: attributes), for: .normal)
         $0.titleLabel?.font = .font(weight: .regular, size: 16)
         $0.setTitleColor(UIColor(hex: "667BB3"), for: .normal)
         $0.addTarget(self, action: #selector(handleOpenGuide), for: .touchUpInside)
@@ -71,12 +71,12 @@ final class DevicesController: CommonController {
             ),
             backgroundImageConfig: .init(
                 image: UIImage(named: "buttonGradient"),
-                cornerRadius: Constants.buttonCornerRadius,
+                cornerRadius: LayoutConstants.buttonCornerRadius,
                 shadowConfig: .init(
                     color: UIColor(hex: "117FF5"),
-                    opacity: Constants.shadowOpacity,
-                    offset: Constants.shadowOffset,
-                    radius: Constants.shadowRadius
+                    opacity: LayoutConstants.shadowOpacity,
+                    offset: LayoutConstants.shadowOffset,
+                    radius: LayoutConstants.shadowRadius
                 )
             )
         )
@@ -91,21 +91,12 @@ final class DevicesController: CommonController {
         $0.dataSource = self
         $0.backgroundColor = .clear
         $0.separatorStyle = .none
-        
-        let topInset = ((view.bounds.height - 30) - Constants.headerCellHeight) / 4
-        
-        $0.contentInset = UIEdgeInsets(
-            top: max(topInset, 0),
-            left: 0,
-            bottom: 100,
-            right: 0
-        )
+        $0.contentInset = calculateContentInset()
     }
     
     // MARK: - Properties
     
     private let viewModel = DevicesViewModel()
-    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Lifecycle
     
@@ -113,7 +104,9 @@ final class DevicesController: CommonController {
         super.viewDidLoad()
         configureNavigation()
         setupViewHierarchy()
+        setupControllerConstraints()
         setupObservers()
+        viewModel.startSearch()
     }
     
     // MARK: - Private Methods
@@ -123,30 +116,22 @@ final class DevicesController: CommonController {
     }
     
     private func setupViewHierarchy() {
-        view.addSubviews(
-            tableView,
-            shadowImageView,
-            tryAgainButton,
-            guideButton,
-            blurView
-        )
+        view.addSubviews(tableView, shadowImageView, tryAgainButton, guideButton, blurView)
+        blurView.addSubview(infoView)
+    }
+    
+    private func setupControllerConstraints() {
+        blurView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        blurView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        infoView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.height.equalTo(LayoutConstants.infoViewHeight)
+            $0.width.equalTo(345)
         }
         
-        blurView.addSubviews(infoView)
-        
-        infoView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.height.equalTo(128)
-            make.width.equalTo(345)
-        }
-        
-        shadowImageView.snp.makeConstraints { make in
-            make.bottom.equalToSuperview()
-            make.left.right.equalToSuperview()
-            make.height.equalTo(220)
+        shadowImageView.snp.makeConstraints {
+            $0.bottom.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(220)
         }
         
         tryAgainButton.snp.makeConstraints {
@@ -163,86 +148,109 @@ final class DevicesController: CommonController {
         
         tableView.snp.makeConstraints {
             $0.top.equalTo(topView.snp.bottom).offset(20)
-            $0.bottom.left.right.equalToSuperview()
+            $0.bottom.horizontalEdges.equalToSuperview()
         }
+    }
+    
+    private func calculateContentInset() -> UIEdgeInsets {
+        let topInset = ((view.bounds.height - 30) - LayoutConstants.headerCellHeight) / 4
+        return UIEdgeInsets(
+            top: max(topInset, 0),
+            left: 0,
+            bottom: 100,
+            right: 0
+        )
     }
     
     private func setupObservers() {
         viewModel.onUpdate = { [weak self] in
-            guard let self else { return }
-            let isEmpty = viewModel.devices.isEmpty
-            
-            DispatchQueue.main.async {
-                self.shadowImageView.isHidden = isEmpty
-                self.tryAgainButton.isHidden = true
-                self.tableView.reloadData()
-                
-                if !isEmpty {
-                    self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
-                }
-            }
+            self?.updateUI()
         }
         
         viewModel.onConnected = { [weak self] in
-            DispatchQueue.main.async {
-                guard let self else { return }
-                
-                self.infoView.snp.updateConstraints { make in
-                    make.height.equalTo(283)
-                }
-                
-                self.blurView.isHidden = false
-                self.infoView.configure(
-                    image: UIImage(named: "success"),
-                    title: "Connection succeed!".localized,
-                    subtitle: "You can start using your remote".localized,
-                    needButton: true
-                )
-            }
+            self?.showConnectionSuccess()
         }
         
         viewModel.onConnecting = { [weak self] in
-            DispatchQueue.main.async {
-                guard let self else { return }
-                
-                self.infoView.snp.updateConstraints { make in
-                    make.height.equalTo(128)
-                }
-                
-                self.blurView.isHidden = false
-                self.infoView.configure(
-                    title: "Connection in progress...".localized,
-                    subtitle: "Please, don’t close the app".localized,
-                    needButton: false
-                )
-            }
+            self?.showConnectingState()
         }
         
         viewModel.onConnectionError = { [weak self] in
-            DispatchQueue.main.async {
-                guard let self else { return }
-                
-                self.infoView.snp.updateConstraints { make in
-                    make.height.equalTo(283)
-                }
-                
-                self.blurView.isHidden = false
-                self.infoView.configure(
-                    image: UIImage(named: "error"),
-                    title: "Trouble connecting".localized,
-                    subtitle: "Please, try again".localized,
-                    needButton: true
-                )
-            }
+            self?.showConnectionError()
         }
         
         viewModel.onNotFound = { [weak self] in
+            self?.showNoDevicesFound()
+        }
+    }
+    
+    private func updateUI() {
+        DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             
-            DispatchQueue.main.async {
-                self.tryAgainButton.isHidden = false
-                self.tableView.reloadData()
+            let isEmpty = viewModel.devices.isEmpty
+            shadowImageView.isHidden = isEmpty
+            tryAgainButton.isHidden = true
+            
+            if !isEmpty {
+                tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
             }
+            
+            tableView.reloadData()
+        }
+    }
+    
+    private func showConnectionSuccess() {
+        DispatchQueue.main.async { [weak self] in
+            self?.infoView.snp.updateConstraints {
+                $0.height.equalTo(LayoutConstants.successInfoViewHeight)
+            }
+            
+            self?.blurView.isHidden = false
+            self?.infoView.configure(
+                image: UIImage(named: "success"),
+                title: "Connection succeed!".localized,
+                subtitle: "You can start using your remote".localized,
+                needButton: true
+            )
+        }
+    }
+    
+    private func showConnectingState() {
+        DispatchQueue.main.async { [weak self] in
+            self?.infoView.snp.updateConstraints {
+                $0.height.equalTo(LayoutConstants.infoViewHeight)
+            }
+            
+            self?.blurView.isHidden = false
+            self?.infoView.configure(
+                title: "Connection in progress...".localized,
+                subtitle: "Please, don't close the app".localized,
+                needButton: false
+            )
+        }
+    }
+    
+    private func showConnectionError() {
+        DispatchQueue.main.async { [weak self] in
+            self?.infoView.snp.updateConstraints {
+                $0.height.equalTo(LayoutConstants.successInfoViewHeight)
+            }
+            
+            self?.blurView.isHidden = false
+            self?.infoView.configure(
+                image: UIImage(named: "error"),
+                title: "Trouble connecting".localized,
+                subtitle: "Please, try again".localized,
+                needButton: true
+            )
+        }
+    }
+    
+    private func showNoDevicesFound() {
+        DispatchQueue.main.async { [weak self] in
+            self?.tryAgainButton.isHidden = false
+            self?.tableView.reloadData()
         }
     }
     
@@ -254,7 +262,7 @@ final class DevicesController: CommonController {
     
     @objc private func handleTryAgainAction() {
         generateHapticFeedback()
-        viewModel.reload()
+        viewModel.startSearch()
     }
     
     @objc private func handleCloseAction() {
@@ -268,31 +276,24 @@ final class DevicesController: CommonController {
     }
 }
 
-// MARK: - TableView Delegate & DataSource
+// MARK: - UITableViewDataSource & Delegate
 
 extension DevicesController: UITableViewDataSource {
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
-            return 1
-        }
-        return viewModel.devices.count
+        section == 0 ? 1 : viewModel.devices.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCell(
                 withIdentifier: DeviceHeaderCell.reuseID,
                 for: indexPath
             ) as! DeviceHeaderCell
-            
             cell.configure(isNotFound: viewModel.devicesNotFound)
-            
             return cell
         }
         
@@ -300,25 +301,19 @@ extension DevicesController: UITableViewDataSource {
             withIdentifier: DeviceCell.reuseID,
             for: indexPath
         ) as! DeviceCell
-        
-        let model = viewModel.devices[indexPath.row]
-        cell.configure(tv: model)
-        
+        cell.configure(tv: viewModel.devices[indexPath.row])
         return cell
     }
 }
 
 extension DevicesController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard indexPath.section == 1 else { return }
         generateHapticFeedback()
-        let tv = viewModel.devices[indexPath.row]
-        viewModel.connect(tv: tv)
+        viewModel.connect(device: viewModel.devices[indexPath.row])
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 {
-            return Constants.headerCellHeight
-        }
-        return 106
+        indexPath.section == 0 ? LayoutConstants.headerCellHeight : LayoutConstants.deviceCellHeight
     }
 }

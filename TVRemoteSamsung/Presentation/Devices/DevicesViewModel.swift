@@ -25,19 +25,23 @@ final class DevicesViewModel {
         tvSearcher.startSearch()
     }
     
-    func reload() {
+    func startSearch() {
         devicesNotFound = false
         devices.removeAll()
         onUpdate?()
         tvSearcher.startSearch()
     }
     
-    func connect(tv: SamsungTVModel) {
-        connectedDevice = tv
-        samsungTV = try? SamsungTV(tv: tv, appName: Config.appName)
-        samsungTV?.delegate = self
-        samsungTV?.connectToTV()
-        onConnecting?()
+    func connect(device: SamsungTVModel) {
+        connectedDevice = device
+        do {
+            samsungTV = try SamsungTV(tv: device, appName: Config.appName)
+            samsungTV?.delegate = self
+            samsungTV?.connectToTV()
+            onConnecting?()
+        } catch {
+            onConnectionError?()
+        }
     }
     
     func cancelConnection() {
@@ -62,6 +66,10 @@ extension DevicesViewModel: TVSearchObserving {
     func tvSearchDidStop() {}
     
     func tvSearchDidFindTV(_ tv: TVCommanderKit.TV) {
+        
+        if devices.map({ $0.id }).contains(tv.id) {
+            return
+        }
         
         let tv = SamsungTVModel.init(
             device: SamsungTVModel.Device.init(
