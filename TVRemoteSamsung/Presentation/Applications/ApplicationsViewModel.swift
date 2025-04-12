@@ -7,17 +7,17 @@ final class TVApplicationsViewModel {
     
     // MARK: - Dependencies
     
-    private let appLauncher = TVAppManager()
+    private let appLauncher = SamsungTVAppManager()
     private let connectionService = SamsungTVConnectionService.shared
     
     // MARK: - Properties
     
-    private(set) var availableApps: [TVApp] = TVApp.allApps()
+    private(set) var availableApps: [SamsungTVApp] = SamsungTVApp.allApps()
     
     
     // MARK: - Public Methods
     
-    func launchApplication(_ app: TVApp) {
+    func launchApplication(_ app: SamsungTVApp) {
         
         if let ipAddress = SamsungTVConnectionService.shared.connectedDevice?.ipAddress {
             Task {
@@ -37,7 +37,7 @@ extension TVApplicationsViewModel {
 
 // MARK: - TVApp Extension
 
-extension TVApp {
+extension SamsungTVApp {
     var iconImage: UIImage? {
         let appIcons: [String: String] = [
             "ESPN": "espn",
