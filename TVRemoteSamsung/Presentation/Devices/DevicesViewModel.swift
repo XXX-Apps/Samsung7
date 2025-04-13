@@ -71,48 +71,7 @@ extension DevicesViewModel: TVSearchObserving {
             return
         }
         
-        let tv = SamsungTVModel.init(
-            device: SamsungTVModel.Device.init(
-                countryCode: tv.device?.countryCode,
-                deviceDescription: tv.device?.deviceDescription,
-                developerIp: tv.device?.developerIp,
-                developerMode: tv.device?.developerMode,
-                duid: tv.device?.duid,
-                firmwareVersion: tv.device?.firmwareVersion,
-                frameTvSupport: tv.device?.frameTvSupport,
-                gamePadSupport: tv.device?.gamePadSupport,
-                id: tv.device?.id,
-                imeSyncedSupport: tv.device?.imeSyncedSupport,
-                ip: tv.device?.ip,
-                language: tv.device?.language,
-                model: tv.device?.model,
-                modelName: tv.device?.modelName,
-                name: tv.device?.name,
-                networkType: tv.device?.networkType,
-                os: tv.device?.os,
-                powerState: tv.device?.powerState,
-                resolution: tv.device?.resolution,
-                smartHubAgreement: tv.device?.smartHubAgreement,
-                ssid: tv.device?.ssid,
-                tokenAuthSupport: tv.device?.tokenAuthSupport ?? "",
-                type: tv.device?.type,
-                udn: tv.device?.udn,
-                voiceSupport: tv.device?.voiceSupport,
-                wallScreenRatio: tv.device?.wallScreenRatio,
-                wallService: tv.device?.wallService,
-                wifiMac: tv.device?.wifiMac ?? ""
-            ),
-            id: tv.id,
-            isSupport: tv.isSupport,
-            name: tv.name,
-            remote: tv.remote,
-            type: tv.type,
-            uri: tv.uri,
-            version: tv.version
-        )
-        
-        
-        devices.append(tv)
+        devices.append(tv.map())
         devicesNotFound = false
         onUpdate?()
     }
@@ -142,4 +101,54 @@ extension DevicesViewModel: SamsungTVDelegate {
     func samsungTV(_ samsungTV: SamsungTV, didWriteRemoteCommand command: SamsungTVRemoteCommand) {}
     
     func samsungTV(_ samsungTV: SamsungTV, didEncounterError error: SamsungTVError) {}
+}
+
+extension TVCommanderKit.TV.Device {
+    func map() -> SamsungTVModel.Device {
+        SamsungTVModel.Device.init(
+            countryCode: self.countryCode,
+            deviceDescription: self.deviceDescription,
+            developerIp: self.developerIp,
+            developerMode: self.developerMode,
+            duid: self.duid,
+            firmwareVersion: self.firmwareVersion,
+            frameTvSupport: self.frameTvSupport,
+            gamePadSupport: self.gamePadSupport,
+            id: self.id,
+            imeSyncedSupport: self.imeSyncedSupport,
+            ip: self.ip,
+            language: self.language,
+            model: self.model,
+            modelName: self.modelName,
+            name: self.name,
+            networkType: self.networkType,
+            os: self.os,
+            powerState: self.powerState,
+            resolution: self.resolution,
+            smartHubAgreement: self.smartHubAgreement,
+            ssid: self.ssid,
+            tokenAuthSupport: self.tokenAuthSupport,
+            type: self.type,
+            udn: self.udn,
+            voiceSupport: self.voiceSupport,
+            wallScreenRatio: self.wallScreenRatio,
+            wallService: self.wallService,
+            wifiMac: self.wifiMac
+        )
+    }
+}
+
+extension TVCommanderKit.TV {
+    func map() -> SamsungTVModel {
+        return SamsungTVModel.init(
+            device: self.device?.map(),
+            id: self.id,
+            isSupport: self.isSupport,
+            name: self.name,
+            remote: self.remote,
+            type: self.type,
+            uri: self.uri,
+            version: self.version
+        )
+    }
 }
