@@ -43,7 +43,7 @@ final class TVController: CommonController {
         $0.isHidden = true
     }
     
-    private lazy var inputContainer = KeyboardInputView().apply {
+    private lazy var inputContainer = InputView().apply {
         $0.isHidden = true
         $0.onTextChanged = { [weak self] text in
             guard let self else { return }
