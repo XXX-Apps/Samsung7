@@ -106,7 +106,21 @@ final class DevicesController: CommonController {
         setupViewHierarchy()
         setupControllerConstraints()
         setupObservers()
-        viewModel.startSearch()
+        
+        LocalNetworkAuthorization().requestAuthorization { granted in
+            DispatchQueue.main.async {
+                if granted {
+                    self.viewModel.startSearch()
+                } else {
+                    self.dismiss(animated: true) {
+                        UIApplication.topViewController()?.showAlert(
+                            title: "You need to grant access to the network".localized,
+                            message: "Go to Settings > Privacy > Network > [Your Device Name]".localized
+                        )
+                    }
+                }
+            }
+        }
     }
     
     // MARK: - Private Methods

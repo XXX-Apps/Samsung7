@@ -126,7 +126,7 @@ final class TVApplicationsViewController: CommonController {
         connectButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(30)
             $0.height.equalTo(62)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(164)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(UIScreen.isLittleDevice ? 100 : 164)
         }
         
         appsTableView.snp.makeConstraints {

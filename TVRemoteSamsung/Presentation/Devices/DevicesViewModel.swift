@@ -22,7 +22,6 @@ final class DevicesViewModel {
     
     init() {
         tvSearcher.addSearchObserver(self)
-        tvSearcher.startSearch()
     }
     
     func startSearch() {
@@ -30,6 +29,16 @@ final class DevicesViewModel {
         devices.removeAll()
         onUpdate?()
         tvSearcher.startSearch()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            self.tvSearcher.stopSearch()
+            if self.devices.isEmpty {
+                self.devicesNotFound = true
+                self.onNotFound?()
+            } else {
+                self.onUpdate?()
+            }
+        }
     }
     
     func connect(device: SamsungTVModel) {
@@ -51,17 +60,7 @@ final class DevicesViewModel {
 
 extension DevicesViewModel: TVSearchObserving {
 
-    func tvSearchDidStart() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-            self.tvSearcher.stopSearch()
-            if self.devices.isEmpty {
-                self.devicesNotFound = true
-                self.onNotFound?()
-            } else {
-                self.onUpdate?()
-            }
-        }
-    }
+    func tvSearchDidStart() {}
     
     func tvSearchDidStop() {}
     
@@ -89,6 +88,7 @@ extension DevicesViewModel: SamsungTVDelegate {
         switch authStatus {
         case .allowed:
             if let connectedDevice {
+                LocalDataBase.shared.saveConnectedDevice(connectedDevice)
                 connectionManager.connect(to: connectedDevice, appName: Config.appName, commander: samsungTV)
                 onConnected?()
                 onUpdate?()

@@ -17,7 +17,6 @@ class OptionsController: CommonController {
         configureViewHierarchy()
         configureContentProvider()
         configureNavigation()
-        markOnboardingAsComplete()
     }
     
     private func configureViewHierarchy() {
@@ -40,6 +39,7 @@ class OptionsController: CommonController {
         menuTableView.dataSource = self
         menuTableView.backgroundColor = .clear
         menuTableView.separatorStyle = .none
+        menuTableView.contentInset.top = 20
         menuTableView.contentInset.bottom = 100
     }
     
@@ -52,10 +52,6 @@ class OptionsController: CommonController {
         navigationTitle.text = "Options".localized
         navigationTitle.font = .font(weight: .medium, size: 16)
         configurNavigation(centerView: navigationTitle)
-    }
-    
-    private func markOnboardingAsComplete() {
-        LocalDataBase.shared.isOnboardingShown = true
     }
 }
 
@@ -135,7 +131,9 @@ extension OptionsController: UITableViewDataSource, UITableViewDelegate {
     }
     
     private func presentPremiumPaywall() {
-        // Paywall presentation logic
+        let vc = Paywall()
+        vc.isFromOnboarding = false
+        present(vc: vc)
     }
     
     private func presentIconSelection() {

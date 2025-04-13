@@ -1,5 +1,6 @@
 import Foundation
 import StorageManager
+import TVRemoteControl
 
 final class LocalDataBase {
 
@@ -36,6 +37,30 @@ final class LocalDataBase {
         set {
             storageManager.set(newValue, forKey: Constants.userActionCounter)
         }
+    }
+    
+    
+    private let deviceKey = "ConnectedTVDevice"
+    
+    func saveConnectedDevice(_ device: SamsungTVModel) {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(device) {
+            UserDefaults.standard.set(encoded, forKey: deviceKey)
+        }
+    }
+    
+    func restoreConnectedDevice() -> SamsungTVModel? {
+        if let savedDevice = UserDefaults.standard.data(forKey: deviceKey) {
+            let decoder = JSONDecoder()
+            if let device = try? decoder.decode(SamsungTVModel.self, from: savedDevice) {
+                return device
+            }
+        }
+        return nil
+    }
+    
+    private func clearConnectedDevice() {
+        UserDefaults.standard.removeObject(forKey: deviceKey)
     }
 
     // MARK: - Constants
