@@ -91,11 +91,11 @@ final class TVControllerViewModel: TVControllerViewModelProtocol {
     }
     
     func incrementUserActionCounter() {
-        localDatabase.userActionCounter += 1
+        localDatabase.buttonsTapNumber += 1
     }
     
     func shouldShowFeedback() -> Bool {
-        !localDatabase.isFeedbackShown && localDatabase.userActionCounter > 4
+        !localDatabase.wasRevviewScreen && localDatabase.buttonsTapNumber > 4
     }
     
     func openKeyboard() {

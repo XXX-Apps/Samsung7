@@ -152,7 +152,7 @@ final class ReviewController: UIViewController {
     }
     
     private func markFeedbackAsShown() {
-        LocalDataBase.shared.isFeedbackShown = true
+        LocalDataBase.shared.wasRevviewScreen = true
     }
     
     private func presentAppStoreReview() {

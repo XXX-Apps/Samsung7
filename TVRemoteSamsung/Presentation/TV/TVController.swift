@@ -214,7 +214,7 @@ final class TVController: CommonController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        LocalDataBase.shared.isOnboardingShown = true
+        LocalDataBase.shared.needSkipOnboarding = true
                 
         configurNavigation(
             leftView: powerButton,
@@ -477,8 +477,11 @@ final class TVController: CommonController {
     }
     
     private func openPaywall() {
-        let vc = Paywall()
-        vc.isFromOnboarding = false
+        let vc = PaywallViewController(
+            interactor: OnboardingInteractor(
+                coordinator: OnboardingCoordinator(window: nil)
+            )
+        )
         present(vc: vc)
     }
 }

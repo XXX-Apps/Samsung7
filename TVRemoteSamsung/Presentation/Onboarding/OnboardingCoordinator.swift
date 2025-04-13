@@ -1,74 +1,143 @@
 import UIKit
+import PremiumManager
+import SafariServices
 import Utilities
 
-struct OnboardingModel {
-    let image: UIImage?
+// MARK: - View Model
+
+struct FooterButtonConfig {
     let title: String
-    let subtitle: String
-    let rating: Bool
+    let action: Selector
 }
 
-class OnboardingCoordinator {
+struct OnboardingViewModel {
+    let backgroundImage: UIImage?
+    let titleText: String
+    let descriptionText: String
+    let needRating: Bool
+}
+
+// MARK: - Onboarding Module
+
+protocol OnboardingBusinessLogic {
+    func proceedToNextStep()
+    func showPrivacyPolicy()
+    func showTermsOfService()
+    func restorePurchases()
+    func completeOnboarding()
+}
+
+// Interactor Implementation
+final class OnboardingInteractor: @preconcurrency OnboardingBusinessLogic {
     
-    private let window: UIWindow
-    private var currentIndex = 0
-    private let models: [OnboardingModel] = [
-        OnboardingModel(
-            image: UIImage(named: "onboarding_0"),
-            title: "Convenient TV Remote".localized,
-            subtitle: "Control your TV anytime in a comfortable way".localized,
-            rating: false
+    private weak var coordinator: OnboardingCoordinator?
+    
+    init(coordinator: OnboardingCoordinator) {
+        self.coordinator = coordinator
+    }
+    
+    func proceedToNextStep() {
+        coordinator?.routeToNextScreen()
+    }
+    
+    func showPrivacyPolicy() {
+        coordinator?.showWebPage(url: Config.privacy)
+    }
+    
+    func showTermsOfService() {
+        coordinator?.showWebPage(url: Config.terms)
+    }
+    
+    @MainActor func restorePurchases() {
+        PremiumManager.shared.restorePurchases()
+    }
+    
+    func completeOnboarding() {
+        coordinator?.finishOnboarding()
+    }
+}
+
+final class OnboardingCoordinator {
+    
+    private let window: UIWindow?
+    private var currentStep = 0
+    
+    private lazy var steps: [OnboardingViewModel] = [
+        OnboardingViewModel(
+            backgroundImage: UIImage(named: "onboarding_0"),
+            titleText: "Convenient TV Remote".localized,
+            descriptionText: "Control your TV anytime in a comfortable way".localized,
+            needRating: false
         ),
-        OnboardingModel(
-            image: UIImage(named: "onboarding_1"),
-            title: "Multi-functional".localized,
-            subtitle: "Switch keyboards as you wish to get maximum functionality".localized,
-            rating: true
+        OnboardingViewModel(
+            backgroundImage: UIImage(named: "onboarding_1"),
+            titleText: "Multi-functional".localized,
+            descriptionText: "Switch keyboards as you wish to get maximum functionality".localized,
+            needRating: true
         ),
-        OnboardingModel(
-            image: UIImage(named: "onboarding_2"),
-            title: "Your thoughts matters".localized,
-            subtitle: "Your input helps in improving your in-app experience".localized,
-            rating: false
+        OnboardingViewModel(
+            backgroundImage: UIImage(named: "onboarding_2"),
+            titleText: "Your thoughts matters".localized,
+            descriptionText: "Your input helps in improving your in-app experience".localized,
+            needRating: false
         ),
-        OnboardingModel(
-            image: UIImage(named: "onboarding_3"),
-            title: "All platforms in one".localized,
-            subtitle: "Watch all your favorite streaming platforms easily in one place".localized,
-            rating: false
+        OnboardingViewModel(
+            backgroundImage: UIImage(named: "onboarding_3"),
+            titleText: "All platforms in one".localized,
+            descriptionText: "Watch all your favorite streaming platforms easily in one place".localized,
+            needRating: false
         )
     ]
     
-    init(window: UIWindow) {
+    init(window: UIWindow?) {
         self.window = window
     }
     
     func start() {
-        showNextViewController()
+        showCurrentStep()
     }
     
-    private func showNextViewController() {
-        guard currentIndex < models.count else {
-            transitionToPaywall()
+    private func showCurrentStep() {
+        guard currentStep < steps.count else {
+            showPaywall()
             return
         }
         
-        let model = models[currentIndex]
-        let viewController = OnboardingController(model: model, coordinator: self)
-        window.rootViewController = viewController
-        window.makeKeyAndVisible()
+        let viewModel = steps[currentStep]
+        let viewController = OnboardingViewController(
+            viewModel: viewModel,
+            interactor: OnboardingInteractor(coordinator: self),
+            dismissOnClose: false
+        )
         
-        currentIndex += 1
+        window?.rootViewController = viewController
+        window?.makeKeyAndVisible()
+        currentStep += 1
     }
     
-    func goToNextScreen() {
-        showNextViewController()
+    // MARK: - Routing
+    
+    func routeToNextScreen() {
+        showCurrentStep()
     }
     
-    private func transitionToPaywall() {
-        let vc = Paywall()
-        vc.isFromOnboarding = true
-        window.rootViewController = vc
-        window.makeKeyAndVisible()
+    func showWebPage(url: String) {
+        guard let url = URL(string: url) else { return }
+        let safariVC = SFSafariViewController(url: url)
+        window?.rootViewController?.present(safariVC, animated: true)
+    }
+    
+    func finishOnboarding() {
+        window?.rootViewController = TabBarConfigurator.main()
+        window?.makeKeyAndVisible()
+    }
+    
+    private func showPaywall() {
+        let paywall = PaywallViewController.init(
+            dismissOnClose: true,
+            interactor: OnboardingInteractor(coordinator: self)
+        )
+        window?.rootViewController = paywall
+        window?.makeKeyAndVisible()
     }
 }

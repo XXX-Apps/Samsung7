@@ -14,16 +14,33 @@ private enum Constants {
     static let shadowOpacity: Float = 0.6
 }
 
-class OnboardingController: UIViewController {
+class OnboardingViewController: UIViewController {
     
-    let imageView = MyImageView()
-    let titleLabel = UILabel()
-    let subtitleLabel = UILabel()
-    private let bottomStackView = UIStackView()
+
     
     private let disposeBag = DisposeBag()
     
-    private lazy var nextButton: ShadowImageButton = {
+    // UI Components
+    let backgroundImageView = UIImageView().apply {
+        $0.contentMode = .scaleAspectFill
+        $0.clipsToBounds = true
+    }
+    
+    let headerLabel = UILabel().apply {
+        $0.font = UIFont.systemFont(ofSize: 26, weight: .medium)
+        $0.textColor = .white
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+    }
+    
+    let descriptionLabel = UILabel().apply {
+        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        $0.textColor = UIColor(red: 0.4, green: 0.48, blue: 0.7, alpha: 1)
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+    }
+    
+    private lazy var actionButton: ShadowImageButton = {
         let button = ShadowImageButton()
         button.configure(
             buttonConfig: .init(
@@ -46,169 +63,143 @@ class OnboardingController: UIViewController {
                 )
             )
         )
-        button.action = { [weak self] in
-            self?.nextButtonTapped()
-        }
+        button.action = { [weak self] in self?.didTapActionButton() }
         return button
     }()
     
-    private weak var coordinator: OnboardingCoordinator?
-    private var model: OnboardingModel?
-    
-    init(
-        model: OnboardingModel,
-        coordinator: OnboardingCoordinator
-    ) {
-        self.model = model
-        self.coordinator = coordinator
-     
-        super.init(nibName: nil, bundle: nil)
+    private let footerButtonsStack = UIStackView().apply {
+        $0.axis = .horizontal
+        $0.distribution = .fillEqually
+        $0.spacing = 16
     }
     
-    init() {
+    // Dependencies
+    private let interactor: OnboardingBusinessLogic?
+    private let viewModel: OnboardingViewModel?
+    let dismissOnClose: Bool
+    
+    // Lifecycle
+    init(
+        viewModel: OnboardingViewModel?,
+        interactor: OnboardingBusinessLogic?,
+        dismissOnClose: Bool
+    ) {
+        self.viewModel = viewModel
+        self.interactor = interactor
+        self.dismissOnClose = dismissOnClose
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("Unsupported initialization")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViews()
-        setupConstraints()
+        prepareView()
+        prepareLayout()
+        bindViewModel()
+    }
+    
+    // Configuration
+    func prepareView() {
+        view.backgroundColor = UIColor(red: 0.09, green: 0.08, blue: 0.19, alpha: 1)
         
+        backgroundImageView.image = viewModel?.backgroundImage
+        headerLabel.text = viewModel?.titleText
+        descriptionLabel.text = viewModel?.descriptionText
+        
+        if viewModel?.needRating == true {
+            SKStoreReviewController.requestReview()
+        }
+        
+        [
+            FooterButtonConfig.init(title: "Privacy".localized, action: #selector(OnboardingViewController.didTapPrivacyButton)),
+            FooterButtonConfig.init(title: "Restore".localized, action: #selector(OnboardingViewController.didTapRestoreButton)),
+            FooterButtonConfig.init(title: "Terms".localized, action: #selector(OnboardingViewController.didTapTermsButton))
+        ].forEach { buttonConfig in
+            let button = UIButton(type: .system)
+            button.setTitle(buttonConfig.title, for: .normal)
+            button.titleLabel?.font = UIFont.systemFont(
+                ofSize: Locale.current.isEnglish ? 14 : 10,
+                weight: .regular
+            )
+            button.setTitleColor(UIColor(red: 0.4, green: 0.48, blue: 0.7, alpha: 1), for: .normal)
+            button.addTarget(self, action: buttonConfig.action, for: .touchUpInside)
+            footerButtonsStack.addArrangedSubview(button)
+        }
+    }
+    
+    func prepareLayout() {
+        let isCompactDevice = UIScreen.main.bounds.height < 700
+        
+        view.addSubviews(
+            backgroundImageView,
+            headerLabel,
+            descriptionLabel,
+            actionButton,
+            footerButtonsStack
+        )
+        
+        backgroundImageView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(isCompactDevice ? 149 : 149)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(actionButton.snp.top)
+        }
+        
+        headerLabel.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(66)
+            $0.leading.trailing.equalToSuperview().inset(10)
+        }
+        
+        descriptionLabel.snp.makeConstraints {
+            $0.top.equalTo(headerLabel.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(10)
+        }
+        
+        actionButton.snp.makeConstraints {
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-59)
+            $0.leading.trailing.equalToSuperview().inset(22)
+            $0.height.equalTo(69)
+        }
+        
+        footerButtonsStack.snp.makeConstraints {
+            $0.top.equalTo(actionButton.snp.bottom).offset(24)
+            $0.leading.trailing.equalToSuperview().inset(26)
+            $0.height.equalTo(18)
+        }
+    }
+    
+    private func bindViewModel() {
         PremiumManager.shared.isPremium
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { isPremium in
+            .filter { $0 }
+            .subscribe(onNext: { [weak self] isPremium in
                 if isPremium {
-                    self.closeAction()
+                    if self?.dismissOnClose == true {
+                        self?.dismiss()
+                    } else {
+                        self?.interactor?.completeOnboarding()
+                    }
                 }
             })
             .disposed(by: disposeBag)
     }
     
-    private func setupViews() {
-        
-        view.backgroundColor = .init(hex: "161430")
-        
-        imageView.image = model?.image
-        imageView.aspectFill = true
-        imageView.verticalAlignment = .top
-        view.addSubview(imageView)
-        
-        titleLabel.text = model?.title
-        titleLabel.font = .font(weight: .medium, size: 26)
-        titleLabel.textColor = .white
-        titleLabel.textAlignment = .center
-        view.addSubview(titleLabel)
-        
-        subtitleLabel.text = model?.subtitle
-        subtitleLabel.font = .font(weight: .medium, size: 16)
-        subtitleLabel.textColor = .init(hex: "667BB3")
-        subtitleLabel.numberOfLines = 0
-        subtitleLabel.textAlignment = .center
-        view.addSubview(subtitleLabel)
-        
-        view.addSubview(nextButton)
-        
-        bottomStackView.axis = .horizontal
-        bottomStackView.distribution = .fillEqually
-        bottomStackView.spacing = 16
-        
-        let privacyButton = createBottomButton(title: "Privacy".localized)
-        let restoreButton = createBottomButton(title: "Restore".localized)
-        let termsButton = createBottomButton(title: "Terms".localized)
-        
-        privacyButton.addTarget(self, action: #selector(openPrivacy), for: .touchUpInside)
-        restoreButton.addTarget(self, action: #selector(restore), for: .touchUpInside)
-        termsButton.addTarget(self, action: #selector(openTerms), for: .touchUpInside)
-        
-        bottomStackView.addArrangedSubview(privacyButton)
-        bottomStackView.addArrangedSubview(restoreButton)
-        bottomStackView.addArrangedSubview(termsButton)
-        
-        view.addSubview(bottomStackView)
+    // Actions
+    @objc func didTapActionButton() {
+        interactor?.proceedToNextStep()
     }
     
-    private func setupConstraints() {
-        imageView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide).inset(UIScreen.isLittleDevice ? 149 : 149)
-            make.bottom.equalTo(nextButton.snp.top)
-        }
-        
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).inset(66)
-            make.leading.trailing.equalToSuperview().inset(10)
-        }
-        
-        subtitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).inset(107)
-            make.leading.trailing.equalToSuperview().inset(10)
-        }
-        
-        nextButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-59)
-            make.leading.trailing.equalToSuperview().inset(22)
-            make.height.equalTo(69)
-        }
-        
-        bottomStackView.snp.makeConstraints { make in
-            make.top.equalTo(nextButton.snp.bottom).offset(24)
-            make.leading.trailing.equalToSuperview().inset(26)
-            make.height.equalTo(18)
-        }
+    @objc func didTapPrivacyButton() {
+        interactor?.showPrivacyPolicy()
     }
     
-    private func createBottomButton(title: String) -> UIButton {
-        let button = UIButton()
-        button.setTitle(title, for: .normal)
-        button.setTitleColor(.init(hex: "667BB3"), for: .normal)
-        button.titleLabel?.font = .font(weight: .regular, size: Locale().isEnglish ? 14 : 10)
-        return button
+    @objc func didTapTermsButton() {
+        interactor?.showTermsOfService()
     }
     
-    @objc private func nextButtonTapped() {
-        bottomButtonAction()
-    }
-    
-    func bottomButtonAction() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        
-        if model?.rating == true {
-            SKStoreReviewController.requestReview()
-        }
-        coordinator?.goToNextScreen()
-    }
-    
-    @objc private func openPrivacy() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        if let url = URL(string: Config.privacy) {
-            let safariVC = SFSafariViewController(url: url)
-            present(safariVC, animated: true, completion: nil)
-        }
-    }
-    
-    @objc private func openTerms() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        if let url = URL(string: Config.terms) {
-            let safariVC = SFSafariViewController(url: url)
-            present(safariVC, animated: true, completion: nil)
-        }
-    }
-    
-    @objc private func restore() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        PremiumManager.shared.restorePurchases()
-    }
-    
-    @objc private func close() {
-        closeAction()
-    }
-    
-    func closeAction() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        replaceRootViewController(with: TabBarConfigurator.main())
+    @objc func didTapRestoreButton() {
+        interactor?.restorePurchases()
     }
 }

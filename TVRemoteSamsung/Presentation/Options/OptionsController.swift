@@ -45,7 +45,7 @@ class OptionsController: CommonController {
     
     private func configureContentProvider() {
         contentProvider.delegate = self
-        contentProvider.rebuildMenu(forPremiumStatus: false)
+        contentProvider.rebuildMenu(forPremiumStatus: PremiumManager.shared.isPremium.value)
     }
     
     private func configureNavigation() {
@@ -131,8 +131,11 @@ extension OptionsController: UITableViewDataSource, UITableViewDelegate {
     }
     
     private func presentPremiumPaywall() {
-        let vc = Paywall()
-        vc.isFromOnboarding = false
+        let vc = PaywallViewController(
+            interactor: OnboardingInteractor(
+                coordinator: OnboardingCoordinator(window: nil)
+            )
+        )
         present(vc: vc)
     }
     

@@ -12,35 +12,25 @@ final class LocalDataBase {
 
     // MARK: - Public Properties
 
-    var isOnboardingShown: Bool {
-        get {
-            storageManager.get(forKey: Constants.onboardingShownKey, defaultValue: false)
-        }
-        set {
-            storageManager.set(newValue, forKey: Constants.onboardingShownKey)
-        }
+    var needSkipOnboarding: Bool {
+        get { storageManager.get(forKey: onboardingShownKey, defaultValue: false) }
+        set { storageManager.set(newValue, forKey: onboardingShownKey) }
     }
 
-    var isFeedbackShown: Bool {
-        get {
-            storageManager.get(forKey: Constants.feedbackShownKey, defaultValue: false)
-        }
-        set {
-            storageManager.set(newValue, forKey: Constants.feedbackShownKey)
-        }
+    var wasRevviewScreen: Bool {
+        get { storageManager.get(forKey: reviewShownKey, defaultValue: false) }
+        set { storageManager.set(newValue, forKey: reviewShownKey) }
     }
     
-    var userActionCounter: Int {
-        get {
-            storageManager.get(forKey: Constants.userActionCounter, defaultValue: 0)
-        }
-        set {
-            storageManager.set(newValue, forKey: Constants.userActionCounter)
-        }
+    var buttonsTapNumber: Int {
+        get { storageManager.get(forKey: userActionCounterKey, defaultValue: 0) }
+        set { storageManager.set(newValue, forKey: userActionCounterKey) }
     }
-    
     
     private let deviceKey = "ConnectedTVDevice"
+    private let onboardingShownKey = "onboarding_key_dataBase"
+    private let reviewShownKey = "review_key_dataBase"
+    private let userActionCounterKey = "user_actions_key_dataBase"
     
     func saveConnectedDevice(_ device: SamsungTVModel) {
         let encoder = JSONEncoder()
@@ -57,17 +47,5 @@ final class LocalDataBase {
             }
         }
         return nil
-    }
-    
-    private func clearConnectedDevice() {
-        UserDefaults.standard.removeObject(forKey: deviceKey)
-    }
-
-    // MARK: - Constants
-
-    private enum Constants {
-        static let onboardingShownKey = "onboarding_shown"
-        static let feedbackShownKey = "feedback_shown"
-        static let userActionCounter = "user_action_counter"
     }
 }

@@ -13,7 +13,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         self.window = window
         
-        if !LocalDataBase.shared.isOnboardingShown {
+        if !LocalDataBase.shared.needSkipOnboarding {
             coordinator = OnboardingCoordinator(window: window)
             coordinator?.start()
         } else {
