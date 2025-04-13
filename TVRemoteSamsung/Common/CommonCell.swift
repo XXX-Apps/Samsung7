@@ -75,6 +75,7 @@ final class CommonCell: UITableViewCell {
         leftImageView.image = app.iconImage
         
         leftImageView.snp.updateConstraints { make in
+            make.left.equalToSuperview().inset(20)
             make.height.width.equalTo(50)
         }
         

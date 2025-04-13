@@ -65,4 +65,31 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 }
 
+extension UIView {
+    public func addCircleInnerShadow(
+        shadowColor: UIColor = .black,
+        opacity: Float = 0.15,
+        shadowOffset: CGSize = CGSize(width: 0, height: 8),
+        insets: CGPoint = .init(x: 1, y: 1)
+    ) {
+        let innerShadow = CALayer()
+        innerShadow.name = "innerShadow"
+        innerShadow.frame = bounds
+        
+        let radius = self.layer.cornerRadius
+        let path = UIBezierPath(roundedRect: innerShadow.bounds.insetBy(dx: insets.x, dy: insets.y), cornerRadius: radius)
+        let cutout = UIBezierPath(roundedRect: innerShadow.bounds, cornerRadius: radius).reversing()
+        
+        path.append(cutout)
+        innerShadow.shadowPath = path.cgPath
+        innerShadow.masksToBounds = true
+        
+        innerShadow.shadowColor = shadowColor.cgColor
+        innerShadow.shadowOffset = shadowOffset
+        innerShadow.shadowOpacity = opacity
+        innerShadow.shadowRadius = 2
+        innerShadow.cornerRadius = self.layer.cornerRadius
+        layer.addSublayer(innerShadow)
+    }
+}
 

@@ -5,7 +5,6 @@ import SnapKit
 
 private enum PanelConstants {
     static let buttonSize: CGFloat = 72
-    static let buttonCornerRadius: CGFloat = 36
     static let buttonInsets: CGFloat = 10
     static let centerButtonMultiplier: CGFloat = 0.3
     static let centerViewInsets: CGFloat = 70
@@ -19,7 +18,7 @@ private enum PanelConstants {
 
 // MARK: - PanelView
 
-final class PanelView: UIView {
+final class ManipulatorView: UIView {
     
     // MARK: - Callbacks
     
@@ -167,11 +166,12 @@ final class PanelView: UIView {
         button.setTitle(title, for: .normal)
         button.titleLabel?.font = PanelConstants.buttonTitleFont
         button.backgroundColor = PanelConstants.buttonBackgroundColor
-        button.layer.cornerRadius = PanelConstants.buttonCornerRadius
+        
         button.addTarget(self, action: action, for: .touchUpInside)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            button.addInnerShadow()
+            button.layer.cornerRadius = button.frame.height / 2
+            button.addCircleInnerShadow()
         }
         
         return button

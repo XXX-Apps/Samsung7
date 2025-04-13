@@ -91,7 +91,7 @@ final class KeyboardView: UIView {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             button.layer.cornerRadius = button.bounds.height * KeyboardConstants.buttonCornerRadiusMultiplier
-            button.addInnerShadow()
+            button.addCircleInnerShadow()
         }
         
         return button
