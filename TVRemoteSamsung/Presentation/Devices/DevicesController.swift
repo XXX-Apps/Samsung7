@@ -2,6 +2,7 @@ import SnapKit
 import UIKit
 import TVRemoteControl
 import ShadowImageButton
+import Utilities
 import CustomBlurEffectView
 
 // MARK: - Constants
@@ -145,7 +146,7 @@ final class DevicesController: CommonController {
         
         shadowImageView.snp.makeConstraints {
             $0.bottom.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(220)
+            $0.height.equalTo(UIScreen.isLittleDevice ? 100 : 220)
         }
         
         tryAgainButton.snp.makeConstraints {
@@ -171,7 +172,7 @@ final class DevicesController: CommonController {
         return UIEdgeInsets(
             top: max(topInset, 0),
             left: 0,
-            bottom: 100,
+            bottom: 150,
             right: 0
         )
     }

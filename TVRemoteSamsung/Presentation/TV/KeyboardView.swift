@@ -5,7 +5,7 @@ import Utilities
 // MARK: - Constants
 
 private enum KeyboardConstants {
-    static let buttonSize: CGFloat = 72
+//    static let buttonSize: CGFloat = 72
     static let buttonSpacing: CGFloat = 20.5
     static let rowSpacing: CGFloat = 12
     static let buttonCornerRadiusMultiplier: CGFloat = 0.5
@@ -86,7 +86,7 @@ final class KeyboardView: UIView {
         button.addTarget(self, action: #selector(handleNumberTap(_:)), for: .touchUpInside)
         
         button.snp.makeConstraints {
-            $0.width.equalTo(KeyboardConstants.buttonSize)
+            $0.width.equalTo(button.snp.height)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -105,7 +105,7 @@ final class KeyboardView: UIView {
         guard bounds.height != .zero else { return }
         
         let useCompactLayout = bounds.height < KeyboardConstants.minHeightForStandardLayout
-        let buttonHeight = useCompactLayout ? (bounds.height - 100) / 4 : KeyboardConstants.buttonSize
+        let buttonHeight = useCompactLayout ? (bounds.height - 100) / 4 : 72
         
         mainStackView.arrangedSubviews.forEach { row in
             guard let stackRow = row as? UIStackView else { return }

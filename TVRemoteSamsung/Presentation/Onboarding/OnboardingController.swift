@@ -16,14 +16,12 @@ private enum Constants {
 
 class OnboardingViewController: UIViewController {
     
-
-    
     private let disposeBag = DisposeBag()
     
     // UI Components
-    let backgroundImageView = UIImageView().apply {
-        $0.contentMode = .scaleAspectFill
-        $0.clipsToBounds = true
+    let backgroundImageView = MyImageView().apply {
+        $0.aspectFill = true
+        $0.verticalAlignment = .top
     }
     
     let headerLabel = UILabel().apply {

@@ -44,7 +44,7 @@ final class TVController: CommonController {
         enum Text {
             static let noConnection = "No connection".localized
             static let volTitle = "VOL"
-            static let padTitle = "Swipe or tap in this field to use"
+            static let padTitle = "Swipe or tap in this field to use".localized
         }
         
         enum Images {
@@ -334,7 +334,7 @@ final class TVController: CommonController {
             }
             .store(in: &cancellables)
         
-        viewModel.onOpenReview = { [weak self] in self?.present(vc: ReviewController()) }
+        viewModel.onOpenReview = { [weak self] in self?.presentCrossDissolve(vc: ReviewController()) }
         viewModel.onOpenKeyboard = { [weak self] in self?.openKeyboard() }
         viewModel.onOpenPaywall = { [weak self] in self?.openPaywall() }
         viewModel.onOpenDevices = { [weak self] in self?.connectAction() }

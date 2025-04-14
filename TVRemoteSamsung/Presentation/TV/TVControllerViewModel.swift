@@ -67,6 +67,13 @@ final class TVControllerViewModel: TVControllerViewModelProtocol {
             onOpenDevices?()
             return
         }
+        
+        incrementUserActionCounter()
+        
+        if shouldShowFeedback() {
+            onOpenReview?()
+        }
+        
         connectionManager.sendCommand(command)
     }
     

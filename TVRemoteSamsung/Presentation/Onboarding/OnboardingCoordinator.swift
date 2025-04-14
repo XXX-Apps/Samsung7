@@ -73,13 +73,13 @@ final class OnboardingCoordinator {
             backgroundImage: UIImage(named: "onboarding_1"),
             titleText: "Multi-functional".localized,
             descriptionText: "Switch keyboards as you wish to get maximum functionality".localized,
-            needRating: true
+            needRating: false
         ),
         OnboardingViewModel(
             backgroundImage: UIImage(named: "onboarding_2"),
             titleText: "Your thoughts matters".localized,
             descriptionText: "Your input helps in improving your in-app experience".localized,
-            needRating: false
+            needRating: true
         ),
         OnboardingViewModel(
             backgroundImage: UIImage(named: "onboarding_3"),
