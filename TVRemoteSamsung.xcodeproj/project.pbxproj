@@ -239,7 +239,7 @@
 				INFOPLIST_FILE = TVRemoteSamsung/Info.plist;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Permission to access the local network is required to search for your Fire Stick device.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -273,7 +273,7 @@
 				INFOPLIST_FILE = TVRemoteSamsung/Info.plist;
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Permission to access the local network is required to search for your Fire Stick device.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
