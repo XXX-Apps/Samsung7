@@ -39,12 +39,12 @@ final class GuideController: UIViewController {
     
     private lazy var navigationTitleLabel = UILabel().then {
         $0.text = "Advices for connecting".localized
-        $0.font = .font(weight: .medium, size: 16)
+        $0.font = .font(weight: .medium, size: 20)
         $0.textAlignment = .center
     }
     
     private lazy var closeButton = UIButton().then {
-        $0.setImage(UIImage(named: "close"), for: .normal)
+        $0.setImage(UIImage(named: "closeWhite"), for: .normal)
         $0.addTarget(self, action: #selector(handleCloseAction), for: .touchUpInside)
     }
     

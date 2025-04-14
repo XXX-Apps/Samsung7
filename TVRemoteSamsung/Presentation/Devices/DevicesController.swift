@@ -12,7 +12,7 @@ private enum LayoutConstants {
     static let shadowRadius: CGFloat = 14.7
     static let shadowOffset = CGSize(width: 0, height: 4)
     static let shadowOpacity: Float = 0.6
-    static let headerCellHeight: CGFloat = 400
+    static let headerCellHeight: CGFloat = 450
     static let deviceCellHeight: CGFloat = 106
     static let infoViewHeight: CGFloat = 128
     static let successInfoViewHeight: CGFloat = 283
@@ -208,7 +208,7 @@ final class DevicesController: CommonController {
             tryAgainButton.isHidden = true
             
             if !isEmpty {
-                tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 100, right: 0)
+                tableView.contentInset = UIEdgeInsets(top: UIScreen.isLittleDevice ? -80 : 0, left: 0, bottom: 100, right: 0)
             }
             
             tableView.reloadData()

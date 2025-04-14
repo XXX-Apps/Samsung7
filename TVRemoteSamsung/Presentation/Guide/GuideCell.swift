@@ -64,7 +64,7 @@ final class GuideCell: UITableViewCell {
         customBackgroundView.snp.makeConstraints { make in
             make.left.right.equalToSuperview().inset(24)
             make.top.equalToSuperview()
-            make.bottom.equalToSuperview().inset(14)
+            make.bottom.equalToSuperview().inset(20)
         }
         
         titleLabel.snp.makeConstraints { make in

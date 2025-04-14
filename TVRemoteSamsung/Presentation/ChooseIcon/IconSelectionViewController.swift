@@ -12,7 +12,7 @@ enum AppIcon: String, CaseIterable, Identifiable {
     var previewImage: UIImage? {
         switch self {
         case .primary: return UIImage(named: "playstore")
-        case .alternative: return UIImage(named: "playstore1")
+        case .alternative: return UIImage(named: "playstore-1")
         }
     }
     

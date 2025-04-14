@@ -10,6 +10,7 @@ final class DeviceHeaderCell: UITableViewCell {
     
     private let tvImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "tv"))
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
@@ -76,8 +77,8 @@ final class DeviceHeaderCell: UITableViewCell {
         contentView.addSubview(centerImageView)
         
         tvImageView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview()
-            make.width.equalTo(tvImageView.snp.height)
+            make.top.bottom.equalToSuperview().inset(-200)
+//            make.width.equalTo(tvImageView.snp.height)
             make.centerX.equalToSuperview()
         }
        

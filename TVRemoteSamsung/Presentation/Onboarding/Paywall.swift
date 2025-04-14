@@ -19,15 +19,27 @@ final class PaywallViewController: OnboardingViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private let closeButton = UIButton().apply {
-        $0.setImage(UIImage(named: "closeGray"), for: .normal)
+    override func prepareButtons() {
+        [
+            FooterButtonConfig.init(title: "Privacy".localized, action: #selector(OnboardingViewController.didTapPrivacyButton)),
+            FooterButtonConfig.init(title: "Restore".localized, action: #selector(OnboardingViewController.didTapRestoreButton)),
+            FooterButtonConfig.init(title: "Terms".localized, action: #selector(OnboardingViewController.didTapTermsButton)),
+            FooterButtonConfig.init(title: "Not now".localized, action: #selector(closeFlow)),
+        ].forEach { buttonConfig in
+            let button = UIButton(type: .system)
+            button.setTitle(buttonConfig.title, for: .normal)
+            button.titleLabel?.font = UIFont.systemFont(
+                ofSize: Locale.current.isEnglish ? 14 : 10,
+                weight: .regular
+            )
+            button.setTitleColor(UIColor(red: 0.4, green: 0.48, blue: 0.7, alpha: 1), for: .normal)
+            button.addTarget(self, action: buttonConfig.action, for: .touchUpInside)
+            footerButtonsStack.addArrangedSubview(button)
+        }
     }
     
     override func prepareView() {
         super.prepareView()
-        
-        view.addSubview(closeButton)
-        closeButton.addTarget(self, action: #selector(closeFlow), for: .touchUpInside)
         
         backgroundImageView.image = UIImage(named: "paywall")
         headerLabel.text = "Get all Unlimited".localized
@@ -35,16 +47,6 @@ final class PaywallViewController: OnboardingViewController {
         if let product = PremiumManager.shared.products.value.first, let price = product.priceNumber, let duration = product.duration?.rawValue.localized {
             let priceText = "\(product.currency)\(String(format: "%.2f", price))/\(duration)"
             descriptionLabel.text = String(format: "Unlimited connections, all the tools and much more at".localized, priceText)
-        }
-    }
-    
-    override func prepareLayout() {
-        super.prepareLayout()
-        
-        closeButton.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(21)
-            $0.trailing.equalToSuperview().offset(-20)
-            $0.size.equalTo(20)
         }
     }
     

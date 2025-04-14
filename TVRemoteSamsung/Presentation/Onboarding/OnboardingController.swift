@@ -21,19 +21,19 @@ class OnboardingViewController: UIViewController {
     // UI Components
     let backgroundImageView = MyImageView().apply {
         $0.aspectFill = true
-        $0.verticalAlignment = .top
+        $0.verticalAlignment = UIScreen.isLittleDevice ? .top : .bottom
     }
     
     let headerLabel = UILabel().apply {
-        $0.font = UIFont.systemFont(ofSize: 26, weight: .medium)
+        $0.font = .font(weight: .medium, size: 26)
         $0.textColor = .white
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
     
     let descriptionLabel = UILabel().apply {
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        $0.textColor = UIColor(red: 0.4, green: 0.48, blue: 0.7, alpha: 1)
+        $0.font = .font(weight: .medium, size: 16)
+        $0.textColor = .init(hex: "667BB3")
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
@@ -65,7 +65,7 @@ class OnboardingViewController: UIViewController {
         return button
     }()
     
-    private let footerButtonsStack = UIStackView().apply {
+    let footerButtonsStack = UIStackView().apply {
         $0.axis = .horizontal
         $0.distribution = .fillEqually
         $0.spacing = 16
@@ -111,6 +111,10 @@ class OnboardingViewController: UIViewController {
             SKStoreReviewController.requestReview()
         }
         
+        prepareButtons()
+    }
+    
+    func prepareButtons() {
         [
             FooterButtonConfig.init(title: "Privacy".localized, action: #selector(OnboardingViewController.didTapPrivacyButton)),
             FooterButtonConfig.init(title: "Restore".localized, action: #selector(OnboardingViewController.didTapRestoreButton)),

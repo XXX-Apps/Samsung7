@@ -31,7 +31,7 @@ final class TVController: CommonController {
             static let regularDeviceButtonHeight: CGFloat = 72
             static let safeAreaBottomInset: CGFloat = 94
             static let stackViewBottomOffset: CGFloat = -20
-            static let pageControlBottomInset: CGFloat = -26
+            static let pageControlBottomInset: CGFloat = UIScreen.isLittleDevice ? -16 : -26
             static let padTopInset: CGFloat = 30
             static let padBottomInset: CGFloat = 40
         }
@@ -61,7 +61,7 @@ final class TVController: CommonController {
         }
         
         enum Fonts {
-            static let title = UIFont.font(weight: .medium, size: 16)
+            static let title = UIFont.font(weight: .medium, size: 18)
             static let padTitle = UIFont.font(weight: .regular, size: 16)
             static let volTitle = UIFont.font(weight: .regular, size: 18)
         }
@@ -161,8 +161,7 @@ final class TVController: CommonController {
     private lazy var imageButtonsStackView: UIStackView = {
         let view = UIStackView(arrangedSubviews: [searchButton, playBackButton, playButton, playForwardButton])
         view.axis = .horizontal
-        view.spacing = Constants.Layout.stackViewSpacing
-        view.distribution = .fillEqually
+        view.distribution = .equalSpacing
         return view
     }()
     
@@ -205,7 +204,7 @@ final class TVController: CommonController {
     private lazy var volumeButtonsStackView: UIStackView = {
         let view = UIStackView(arrangedSubviews: [muteButton, volumeView])
         view.axis = .horizontal
-        view.spacing = Constants.Layout.volumeStackViewSpacing
+        view.spacing = (UIScreen.main.bounds.width - 48 - (72 * 4)) / 3
         return view
     }()
     
@@ -377,7 +376,9 @@ final class TVController: CommonController {
         button.setImage(UIImage(named: imageName), for: .normal)
         button.backgroundColor = .init(hex: "31337C")
         button.addTarget(self, action: selector, for: .touchUpInside)
-        
+        button.snp.makeConstraints { make in
+            make.width.equalTo(button.snp.height)
+        }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             button.layer.cornerRadius = button.frame.height / 2
             button.addCircleInnerShadow()

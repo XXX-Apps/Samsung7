@@ -90,7 +90,7 @@ class PremiumPromotionCell: UITableViewCell {
         }
         
         actionButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(59)
+            $0.trailing.equalToSuperview().inset(UIScreen.isBigDevice ? 79 : 59)
             $0.bottom.equalToSuperview().inset(15)
             $0.size.equalTo(CGSize(width: 127, height: 34))
         }

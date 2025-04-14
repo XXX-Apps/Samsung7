@@ -5,13 +5,13 @@ import Utilities
 // MARK: - Constants
 
 private enum KeyboardConstants {
-//    static let buttonSize: CGFloat = 72
-    static let buttonSpacing: CGFloat = 20.5
+    static let buttonSize: CGFloat = UIScreen.isBigDevice ? 82 : (UIScreen.isLittleDevice ? 60 : 72)
+    static let buttonSpacing: CGFloat = UIScreen.isLittleDevice ? 10 : 20.5
     static let rowSpacing: CGFloat = 12
     static let buttonCornerRadiusMultiplier: CGFloat = 0.5
     static let buttonBackgroundColor = UIColor(hex: "31337C")
     static let buttonFont = UIFont.font(weight: .regular, size: 24)
-    static let minHeightForStandardLayout: CGFloat = (72 * 4) + 36
+    static let minHeightForStandardLayout: CGFloat = (buttonSize * 4) + 36
 }
 
 // MARK: - KeyboardView
@@ -54,7 +54,7 @@ final class KeyboardView: UIView {
     private func setupView() {
         addSubview(mainStackView)
         mainStackView.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
+            $0.centerY.equalToSuperview().offset(UIScreen.isLittleDevice ? -10 : 0)
             $0.horizontalEdges.equalToSuperview()
         }
     }
@@ -105,7 +105,7 @@ final class KeyboardView: UIView {
         guard bounds.height != .zero else { return }
         
         let useCompactLayout = bounds.height < KeyboardConstants.minHeightForStandardLayout
-        let buttonHeight = useCompactLayout ? (bounds.height - 100) / 4 : 72
+        let buttonHeight = useCompactLayout ? (bounds.height - 100) / 4 : KeyboardConstants.buttonSize
         
         mainStackView.arrangedSubviews.forEach { row in
             guard let stackRow = row as? UIStackView else { return }

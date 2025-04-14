@@ -1,4 +1,5 @@
 import UIKit
+import FirebaseCore
 import TVRemoteControl
 import PremiumManager
 
@@ -8,8 +9,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let connectionManager = SamsungTVConnectionService.shared
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-//        FirebaseApp.configure()
-        PremiumManager.shared.configure(with: .init(apiKey: Config.apphudKey, debugMode: true))
+        FirebaseApp.configure()
+        PremiumManager.shared.configure(with: .init(apiKey: Config.apphudKey, debugMode: false))
         PremiumManager.shared.fetchProducts()
         
         if let device = LocalDataBase.shared.restoreConnectedDevice() {
@@ -69,15 +70,18 @@ extension UIView {
     public func addCircleInnerShadow(
         shadowColor: UIColor = .black,
         opacity: Float = 0.15,
-        shadowOffset: CGSize = CGSize(width: 0, height: 8),
-        insets: CGPoint = .init(x: 1, y: 1)
+        shadowRadius: CGFloat = 5,
+        insets: CGSize = .init(width: 8, height: 8)
     ) {
+        layer.sublayers?.filter { $0.name == "innerShadow" }.forEach { $0.removeFromSuperlayer() }
+        
         let innerShadow = CALayer()
         innerShadow.name = "innerShadow"
         innerShadow.frame = bounds
         
-        let radius = self.layer.cornerRadius
-        let path = UIBezierPath(roundedRect: innerShadow.bounds.insetBy(dx: insets.x, dy: insets.y), cornerRadius: radius)
+        let radius = layer.cornerRadius
+        let path = UIBezierPath(roundedRect: innerShadow.bounds.insetBy(dx: insets.width, dy: insets.height),
+                               cornerRadius: radius)
         let cutout = UIBezierPath(roundedRect: innerShadow.bounds, cornerRadius: radius).reversing()
         
         path.append(cutout)
@@ -85,11 +89,11 @@ extension UIView {
         innerShadow.masksToBounds = true
         
         innerShadow.shadowColor = shadowColor.cgColor
-        innerShadow.shadowOffset = shadowOffset
+        innerShadow.shadowOffset = .zero
         innerShadow.shadowOpacity = opacity
-        innerShadow.shadowRadius = 2
-        innerShadow.cornerRadius = self.layer.cornerRadius
+        innerShadow.shadowRadius = shadowRadius
+        innerShadow.cornerRadius = radius
+        
         layer.addSublayer(innerShadow)
     }
 }
-

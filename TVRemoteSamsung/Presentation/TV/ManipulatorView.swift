@@ -1,14 +1,15 @@
 import UIKit
 import SnapKit
+import Utilities
 
 // MARK: - Constants
 
 private enum PanelConstants {
-    static let buttonSize: CGFloat = 72
+    static let buttonSize: CGFloat = UIScreen.isLittleDevice ? 60 : 72
     static let buttonInsets: CGFloat = 10
     static let centerButtonMultiplier: CGFloat = 0.3
-    static let centerViewInsets: CGFloat = 70
-    static let buttonTitleFont = UIFont.font(weight: .regular, size: 18)
+    static let centerViewInsets: CGFloat = UIScreen.isLittleDevice ? 40 : 80
+    static let buttonTitleFont = UIFont.font(weight: .regular, size: UIScreen.isLittleDevice ? 14 : 18)
     static let activeColor: UIColor = .white
     static let inactiveColor = UIColor(hex: "7E94CE")
     static let buttonBackgroundColor = UIColor(hex: "31337C")
