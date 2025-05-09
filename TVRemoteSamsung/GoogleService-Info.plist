@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDGhiaV_G5O_Gek-dMIk3-HMOT6Tw1v8so</string>
+	<key>GCM_SENDER_ID</key>
+	<string>24273735639</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>for.samsung.tv.remote</string>
+	<key>PROJECT_ID</key>
+	<string>samsung7-2c314</string>
+	<key>STORAGE_BUCKET</key>
+	<string>samsung7-2c314.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:24273735639:ios:4f2be58224f2c11d538592</string>
+</dict>
+</plist>

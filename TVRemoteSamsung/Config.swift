@@ -3,9 +3,9 @@ import UIKit
 
 enum Config {
     
-    static let terms = "https://google.com"
-    static let privacy = "https://google.com"
-    static let apphudKey = "app_5WQUhh1ko4e1BUjX5XEPfQSedht6Gn"
-    static let appId = ""
+    static let terms = "https://docs.google.com/document/d/1VSEDqIPwPTVjR8MSKCYpF9qp0xB_ERt6LEDBqWTfxRg/edit?usp=sharing"
+    static let privacy = "https://docs.google.com/document/d/1CpRctMr8Sja16--Dru_axn30MSA46pRbmgFABu4RjRM/edit?usp=sharing"
+    static let apphudKey = "app_KnhpwhQvNR3fHNjcuZM6vWLpUpJiD8"
+    static let appId = "6745526464"
     static let appName = "Samsung Remote TV iOS App"
 }

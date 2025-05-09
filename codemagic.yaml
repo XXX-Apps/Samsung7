@@ -1,0 +1,44 @@
+workflows:
+    ios-workflow:
+      name: iOS Workflow
+      environment:
+        groups:
+          - app_store_credentials
+        vars:
+          XCODE_PROJECT: "TVRemoteSamsung.xcodeproj"
+          XCODE_SCHEME: "TVRemoteSamsung"
+          A_BUNDLE_ID: "for.samsung.tv.remote"
+          APP_STORE_APP_ID: 6745526464
+        xcode: latest
+      scripts:
+        - name: Test echo
+          script: |
+            echo $APP_STORE_CONNECT_ISSUER_ID
+            echo $APP_STORE_CONNECT_KEY_IDENTIFIER
+            echo $APP_STORE_CONNECT_PRIVATE_KEY
+            echo $CERTIFICATE_PRIVATE_KEY
+            defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+        - name: Set up keychain to be used for codesigning using Codemagic CLI 'keychain' command
+          script: |
+            keychain initialize
+        - name: Fetch signing files
+          script: |
+            app-store-connect fetch-signing-files $A_BUNDLE_ID --type IOS_APP_STORE --create --verbose
+        - name: Use system default keychain
+          script: |
+            keychain add-certificates
+        - name: Set up code signing settings on Xcode project
+          script: |
+            xcode-project use-profiles --verbose
+        - name: Build ipa for distribution
+          script: |
+            xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+      artifacts:
+        - build/ios/ipa/*.ipa
+        - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+      publishing:
+        app_store_connect:
+            api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+            key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+            issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+            submit_to_testflight: false
