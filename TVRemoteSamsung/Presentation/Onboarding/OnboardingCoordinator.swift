@@ -134,7 +134,7 @@ final class OnboardingCoordinator {
     
     private func showPaywall() {
         let paywall = PaywallViewController.init(
-            dismissOnClose: true,
+            dismissOnClose: false,
             interactor: OnboardingInteractor(coordinator: self)
         )
         window?.rootViewController = paywall
