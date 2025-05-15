@@ -478,6 +478,10 @@ final class TVController: CommonController {
     }
     
     private func openPaywall() {
+        guard PremiumManager.shared.isPremium.value else {
+            return
+        }
+        
         let vc = PaywallViewController(
             interactor: OnboardingInteractor(
                 coordinator: OnboardingCoordinator(window: nil)
