@@ -240,7 +240,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TVRemoteSamsung/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Gapster;
+				INFOPLIST_KEY_CFBundleDisplayName = "TV Remote";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Permission to access the local network is required to search for your Fire Stick device.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
@@ -278,7 +278,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TVRemoteSamsung/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Gapster;
+				INFOPLIST_KEY_CFBundleDisplayName = "TV Remote";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Permission to access the local network is required to search for your Fire Stick device.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
