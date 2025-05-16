@@ -29,7 +29,7 @@ final class PaywallViewController: OnboardingViewController {
             let button = UIButton(type: .system)
             button.setTitle(buttonConfig.title, for: .normal)
             button.titleLabel?.font = UIFont.systemFont(
-                ofSize: Locale.current.isEnglish ? 14 : 10,
+                ofSize: Locale.current.isEnglish ? 13 : 10,
                 weight: .regular
             )
             button.setTitleColor(UIColor(red: 0.4, green: 0.48, blue: 0.7, alpha: 1), for: .normal)
@@ -57,9 +57,9 @@ final class PaywallViewController: OnboardingViewController {
     
     @objc private func closeFlow() {
         if dismissOnClose {
-            replaceRootViewController(with: TabBarConfigurator.main())
-        } else {
             dismiss()
+        } else {
+            replaceRootViewController(with: TabBarConfigurator.main())
         }
     }
 }

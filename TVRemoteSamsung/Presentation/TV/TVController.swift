@@ -478,7 +478,7 @@ final class TVController: CommonController {
     }
     
     private func openPaywall() {
-        guard PremiumManager.shared.isPremium.value else {
+        guard !PremiumManager.shared.isPremium.value else {
             return
         }
         

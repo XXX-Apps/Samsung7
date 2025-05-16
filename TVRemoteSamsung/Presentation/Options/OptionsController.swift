@@ -131,7 +131,7 @@ extension OptionsController: UITableViewDataSource, UITableViewDelegate {
     }
     
     private func presentPremiumPaywall() {
-        guard PremiumManager.shared.isPremium.value else {
+        guard !PremiumManager.shared.isPremium.value else {
             return
         }
         let vc = PaywallViewController(
