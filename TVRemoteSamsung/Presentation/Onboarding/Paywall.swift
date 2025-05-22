@@ -56,6 +56,7 @@ final class PaywallViewController: OnboardingViewController {
     }
     
     @objc private func closeFlow() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         if dismissOnClose {
             dismiss()
         } else {

@@ -450,7 +450,16 @@ final class TVController: CommonController {
         view.endEditing(true)
     }
     
-    @objc private func connectAction() { generateHapticFeedback(); present(vc: DevicesController()) }
+    @objc private func connectAction() {
+        
+        guard PremiumManager.shared.isPremium.value else {
+            openPaywall()
+            return
+        }
+        generateHapticFeedback()
+        present(vc: DevicesController())
+    }
+    
     @objc private func powerAction() { generateHapticFeedback(); viewModel.sendCommand(.powerToggle) }
     @objc private func exitAction() { generateHapticFeedback(); viewModel.sendCommand(.exit) }
     @objc private func inputAction() { generateHapticFeedback(); viewModel.openKeyboard() }

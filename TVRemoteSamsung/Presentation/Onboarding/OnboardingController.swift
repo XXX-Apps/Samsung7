@@ -190,18 +190,22 @@ class OnboardingViewController: UIViewController {
     
     // Actions
     @objc func didTapActionButton() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         interactor?.proceedToNextStep()
     }
     
     @objc func didTapPrivacyButton() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         interactor?.showPrivacyPolicy()
     }
     
     @objc func didTapTermsButton() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         interactor?.showTermsOfService()
     }
     
     @objc func didTapRestoreButton() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         interactor?.restorePurchases()
     }
 }

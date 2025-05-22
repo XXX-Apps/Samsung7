@@ -159,7 +159,19 @@ final class TVApplicationsViewController: CommonController {
     // MARK: - Actions
     
     @objc private func handleConnectAction() {
+        
         generateHapticFeedback()
+        
+        guard PremiumManager.shared.isPremium.value else {
+            let vc = PaywallViewController(
+                interactor: OnboardingInteractor(
+                    coordinator: OnboardingCoordinator(window: nil)
+                )
+            )
+            present(vc: vc)
+            return
+        }
+      
         present(vc: DevicesController())
     }
 }
